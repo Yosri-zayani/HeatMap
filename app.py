@@ -10,7 +10,9 @@ st.title("Football Player Heatmap Visualization")
 
 # Step 1: Set up paths for match data and structured data (relative or absolute paths)
 match_ids = ['2068','2269','2417','2440','2841','3442','3518','3749','4039']
-
+team  = { 
+    "id":["145","139"] , "team":["Inter","Juve"]
+}
 # Function to load JSON files
 def load_json(filepath):
     with open(filepath, 'r') as file:
@@ -59,8 +61,17 @@ st.write(f"Selected Match: {selected_match_data['home_team']} {selected_match_da
 data_dir = os.path.join(os.getcwd(), 'data', 'matches', selected_match_id)
 match_data = load_json(os.path.join(data_dir, 'match_data.json'))
 structured_data = load_json(os.path.join(data_dir, 'structured_data.json'))
+# determine home team and away team id 
+home_team_id = match_data['home_team']['id']
+away_team_id = match_data['away_team']['id']
 
-# Step 4: Create a mapping for players (trackable_object to player name)
+for player in match_data['players']:
+    if player['team_id'] == home_team_id:
+        player['team_id'] = match_data['home_team']['short_name']
+    elif player['team_id'] == away_team_id:
+        player['team_id'] = match_data['away_team']['short_name']
+
+# Step 3: Create a mapping for players (trackable_object to player name)
 players = {player['trackable_object']: f"{player['first_name']} {player['last_name']} (Team {player['team_id']})" 
            for player in match_data['players']}
 
