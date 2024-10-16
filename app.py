@@ -18,7 +18,6 @@ def load_json(filepath):
     with open(filepath, 'r') as file:
         return json.load(file)
 
-
 # Dictionary to store the match data
 match_data_scores = {}
 
@@ -61,10 +60,12 @@ st.write(f"Selected Match: {selected_match_data['home_team']} {selected_match_da
 data_dir = os.path.join(os.getcwd(), 'data', 'matches', selected_match_id)
 match_data = load_json(os.path.join(data_dir, 'match_data.json'))
 structured_data = load_json(os.path.join(data_dir, 'structured_data.json'))
-# determine home team and away team id 
+
+# Determine home team and away team ID 
 home_team_id = match_data['home_team']['id']
 away_team_id = match_data['away_team']['id']
 
+# Replace team IDs with team short names
 for player in match_data['players']:
     if player['team_id'] == home_team_id:
         player['team_id'] = match_data['home_team']['short_name']
@@ -102,6 +103,11 @@ for period, positions in player_positions.items():
     if len(positions['x']) == 0 or len(positions['y']) == 0:
         st.write(f"No tracking data found for {period.replace('_', ' ')} for the selected player.")
         continue
+
+    # Flip coordinates if the player belongs to the away team (assuming the pitch is symmetric)
+    player_team = players[selected_player_id].split(" ")[-1].strip("()")
+    if player_team == match_data['away_team']['short_name']:
+        positions['x'] = [-x for x in positions['x']]  # Flip the x-coordinates for the away team
 
     # Plot heatmap with the football pitch background
     fig, ax = plt.subplots(figsize=(12, 8))
